@@ -1,1 +1,2 @@
-exportPattern(hello, config)
+exportPattern(install_dependencies, configure_hyperspark, execute_hyperspark,
+              package, execute_jar)
