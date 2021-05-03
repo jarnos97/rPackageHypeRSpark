@@ -8,12 +8,13 @@
 #'
 #' @examples package()
 #'
-#' @export package()
+#' @export packageHyperSpark
 
-package <- function(build_output = F){
+packageHyperSpark <- function(){
   # Navigate to HyperSpark project and package with Maven in terminal
   command <- "cd hyperspark-1-master && mvn package"
-  output <- shell(command, intern = F, show.out.on.console = build_output)
+  # output <- shell(command, intern = F, show.output.on.console = build_output)
+  output <- shell(command, intern = F)
   if (output == 1){
     return("Error: shell command failed")
   } else{
