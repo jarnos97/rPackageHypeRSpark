@@ -14,7 +14,7 @@
 
 executeHyperSpark <- function(){
   # Execute HyperSpark in terminal
-  command <- "cd hyperspark-1-master && java -jar target/hyperh-0.0.1-SNAPSHOT-allinone.jar"
+  command <- "cd HyperSpark-master && java -jar target/hyperh-0.0.1-SNAPSHOT-allinone.jar"
   output <- shell(command, intern = T)
   return(output)
 }
