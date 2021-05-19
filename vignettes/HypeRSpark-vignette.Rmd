@@ -1,0 +1,32 @@
+---
+title: "HypeRSpark vignette"
+author: "Jarno E. Smit"
+package: "HypeRSpark"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{HypeRSpark-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=F}
+library(hypeRSpark)
+```
+
+# Introduction
+
+Why was the package created.
+What is the use?
+Which functions are there?
+
+
+# Functions
+
+## Install dependencies

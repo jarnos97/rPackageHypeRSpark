@@ -12,3 +12,7 @@ LazyData: true
 Imports: rscala, rt3
 SystemRequirements: scala
 RoxygenNote: 7.1.1
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr

@@ -12,7 +12,7 @@
 
 packageHyperSpark <- function(){
   # Navigate to HyperSpark project and package with Maven in terminal
-  command <- "cd hyperspark-1-master && mvn package"
+  command <- "cd HyperSpark-master && mvn package"
   # output <- shell(command, intern = F, show.output.on.console = build_output)
   output <- shell(command, intern = F)
   if (output == 1){

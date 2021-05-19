@@ -4,11 +4,13 @@
 #' file, which is added to the HyperSpark source code.
 #'
 #' @param setProblem Set the problem to be solved.
-#' @param data Set the data for the appplication.
+#' @param data Set the data for the application.
 #' @param setStoppingCondition Set the stopping condition for algorithms to
 #' terminate.
 #' @param stoppingValue Set the stopping value for the stopping condition.
-#' @param setAlgorithms Set the algorithms to execute.
+#' @param setAlgorithms Set the algorithms to execute. Always include
+#' parentheses, e.g. GAAlgorithm()
+#
 #'
 #' @return NULL
 #'
@@ -49,7 +51,7 @@ configureHyperSpark <- function(setProblem,
                                 setDeploymentYarnClient = NONE,
                                 setDeploymentYarnCluster = NONE){
   # Define scala file
-  class_file <- "hyperspark-1-master/src/main/scala/it/polimi/hyperh/apps/MainClass.scala"  # TODO: this will be different!s
+  class_file <- "HyperSpark-master/src/main/scala/it/polimi/hyperh/apps/MainClass.scala"  # TODO: this will be different!s
 
   # Create scala file and add constant code
   initializeFile <- function(){
@@ -81,6 +83,7 @@ import it.polimi.hyperh.spark.FrameworkConf
     write(problemImport, class_file, append = T)
     # Define algorithm import(s) and write to file
     for (alg in setAlgorithms){
+      alg <- strsplit(alg, "\\(")[[1]][1]  # Extract algorithm
       alg_import <- sprintf("import %sp.algorithms.%s", problemPath, alg)
       write(alg_import, class_file, append = T)
     }
@@ -105,7 +108,7 @@ object MainClass{
     write(defProblem, class_file, append = T)
     # Define algorithms
     if (numOfAlgorithms != NONE){  # i.e. if a single algorithm is set
-      defAlgorithm <- sprintf('    val makeAlgo = () => new %s()', setAlgorithms)
+      defAlgorithm <- sprintf('    val makeAlgo = () => new %s', setAlgorithms)
       write(defAlgorithm, class_file, append = T)
       defNumOfAlgorithms <- sprintf('    val numOfAlgorithms = %s', numOfAlgorithms)
       write(defNumOfAlgorithms, class_file, append = T)
@@ -207,11 +210,18 @@ object MainClass{
     }
   } # End configuration
 
-
   # Add constant ending
   addEnding <- function(){
     ending <- '
     val solution: EvaluatedSolution = Framework.run(conf)
+
+    // Write solutions to file
+    val fw = new FileWriter("solution.txt.")
+    try {
+      fw.write(solution.toString)
+    }
+    finally fw.close()
+
     println(solution)
   }
 }

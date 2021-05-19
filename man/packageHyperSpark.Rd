@@ -4,7 +4,7 @@
 \alias{packageHyperSpark}
 \title{Execute HyperSpark}
 \usage{
-packageHyperSpark(build_output = F)
+packageHyperSpark()
 }
 \arguments{
 \item{NULL}{}
