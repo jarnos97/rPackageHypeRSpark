@@ -22,6 +22,15 @@ library(hypeRSpark)
 
 # Introduction
 
+## Installing the package
+Can be installed directly from GitHub, using the *devtools* package.
+
+```{r, eval=F}
+install.packages("devtools")
+devtools::install_github("jarnos97/rPackageHypeRSpark", build_vignettes = TRUE)
+```
+
+
 Why was the package created.
 What is the use?
 Which functions are there?

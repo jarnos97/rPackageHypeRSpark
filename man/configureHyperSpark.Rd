@@ -35,14 +35,15 @@ configureHyperSpark(
 \arguments{
 \item{setProblem}{Set the problem to be solved.}
 
-\item{data}{Set the data for the appplication.}
+\item{data}{Set the data for the application.}
 
 \item{setStoppingCondition}{Set the stopping condition for algorithms to
 terminate.}
 
 \item{stoppingValue}{Set the stopping value for the stopping condition.}
 
-\item{setAlgorithms}{Set the algorithms to execute.}
+\item{setAlgorithms}{Set the algorithms to execute. Always include
+parentheses, e.g. GAAlgorithm()}
 }
 \description{
 Lets users configure HyperSpark. The result is a written .scala
