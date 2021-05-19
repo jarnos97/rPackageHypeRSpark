@@ -9,9 +9,9 @@
 #'
 #' @examples install_dependencies()
 #'
-#' @export installDependencies
+#' @export dependencies
 
-installDependencies <- function(scala=F, maven=F){
+dependencies <- function(scala=F, maven=F){
   # Add code to install scala, maven, etc. Can be difficult as they have to be
   # added to path as well.
 

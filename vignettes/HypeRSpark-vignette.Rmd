@@ -23,10 +23,12 @@ library(hypeRSpark)
 # Introduction
 
 ## Installing the package
-Can be installed directly from GitHub, using the *devtools* package.
+Can be installed directly from GitHub, using the *devtools* package. Building the vignettes relies on the *markdown* package.
+The code below illustrates how the packages can be downloaded and installed from GitHub.
 
 ```{r, eval=F}
 install.packages("devtools")
+install.packages("rmarkdown")
 devtools::install_github("jarnos97/rPackageHypeRSpark", build_vignettes = TRUE)
 ```
 
@@ -39,3 +41,27 @@ Which functions are there?
 # Functions
 
 ## Install dependencies
+
+HyperSpark has the following external dependencies:
+
+* Java SE Development Toolkit (JDK): the package was build using version 8 - update 281. 
+However, it keeps compatibility with newer versions. This requires a (free) Oracle account.
+Download links [here.](https://www.oracle.com/nl/java/technologies/javase/javase-jdk8-downloads.html)
+* Apache Maven: the package was build using version 3.8.1. Download links [here.](https://maven.apache.org/download.cgi)
+However, it keeps compatibility with newer versions.
+
+Users should install these dependencies and add both Java and Maven to the system path. 
+[This tutorial](https://javatutorial.net/set-java-home-windows-10) shows how to add Java to the system path for Windows 10,
+the same method is used for Maven.
+
+
+## Configuring hyperspark
+
+
+## packageHyperSpark
+
+The first time running this command can take a while, as all dependencies need  to be downloaded
+from the Maven repository. Subsequent packaging is much faster. 
+
+
+

@@ -61,6 +61,7 @@ configureHyperSpark <- function(setProblem,
 import it.polimi.hyperh.solution.EvaluatedSolution
 import it.polimi.hyperh.spark.Framework
 import it.polimi.hyperh.spark.FrameworkConf
+import java.io._
 '
 
     # Create scala file with constant code
