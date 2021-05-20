@@ -109,13 +109,14 @@ object MainClass{
     write(defProblem, class_file, append = T)
     # Define algorithms
     if (numOfAlgorithms != NONE){  # i.e. if a single algorithm is set
-      defAlgorithm <- sprintf('    val makeAlgo = () => new %s', setAlgorithms)
+      defAlgorithm <- sprintf('    val makeAlgo = new %s', setAlgorithms)
       write(defAlgorithm, class_file, append = T)
       defNumOfAlgorithms <- sprintf('    val numOfAlgorithms = %s', numOfAlgorithms)
       write(defNumOfAlgorithms, class_file, append = T)
     } else{
       for (alg in setAlgorithms){
-        defAlgorithm <- sprintf('    val alg%s = () => new %s()', alg, alg)
+        alg2 <- strsplit(alg, "\\(")[[1]][1]  # Extract algorithm
+        defAlgorithm <- sprintf('    val alg%s = new %s', alg2, alg)
         write(defAlgorithm, class_file, append = T)
       }
     }
@@ -124,13 +125,13 @@ object MainClass{
 
   # helper function for configuration()
   string_array <- function(algs){
-    text <- '['
+    text <- 'Array('
     index <- 1
     for (item in algs){
       if (index == length(algs)){ # if it is the last item
-        text <- paste0(text, '"', item, '"]')
+        text <- paste0(text, item, ')')
       } else {
-        text <- paste0(text, '"', item, '", ')
+        text <- paste0(text, item, ', ')
       }
       index <- index + 1
     }
@@ -149,6 +150,7 @@ object MainClass{
     } else {  # i.e. array of algorithms
       algs <- NULL
       for (alg in setAlgorithms){
+        alg <- strsplit(alg, "\\(")[[1]][1]  # Extract algorithm
         alg_code <- sprintf('alg%s', alg)
         algs <- c(algs, alg_code)
       }

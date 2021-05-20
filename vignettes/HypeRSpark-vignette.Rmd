@@ -119,7 +119,7 @@ Cluster modes differ in resource manager, there are three available resource man
 
 ### Algorithms
 
-The table below shows the implemented algorithms per problem, including their arguments. Initial seeds are excluded from the arguments, as almost every algorithm excepts it. Algorithms should be defined as a string, including parentheses with arguments. Default values are set for the algorithms, meaning arguments are not mandatory. Users can decide which arguments to change. If an algorithm does not require arguments, parenthesis are *still* required. Some example definitions are:
+The table below shows the implemented algorithms per problem, including their arguments. Initial seeds are excluded from the arguments, as almost every algorithm excepts it. Algorithms should be defined as a string, including parentheses with arguments. Default values are set for the algorithms, meaning arguments are not mandatory. Users can decide which arguments to change. If an algorithm does not require arguments, parenthesis are *still* required. **Please note** that algorithms requiring a problem to be set, can simply be given the argument 'problem'. Some example definitions are:
 
 ```{r, eval=F}
 setAlgorithms = 'GAAlgorithm(popSize = 30, crossRate = 1.0, mutRate = 0.8, 
@@ -128,7 +128,7 @@ setAlgorithms = 'GAAlgorithm(popSize = 30, crossRate = 1.0, mutRate = 0.8,
 
 setAlgorithms = 'GAAlgorithm()'
 
-setAlgorihtms =  'SAAlgorithm(initT = 100.0, minT = 0.001, b = 0.0000005, 
+setAlgorihtms =  'SAAlgorithm(problem, initT = 100.0, minT = 0.001, b = 0.0000005, 
                               totalCosts = 820, boundPercentage = 0.3)'
 ```
 
@@ -192,6 +192,21 @@ hypeRSpark::configureHyperSpark(setProblem = 'PfsProblem',
                                 setNDefaultInitialSeeds = 4,  # no seed
                                 numOfAlgorithms = 4,
                                 setDeploymentLocalNumExecutors = 4,
+                                setNumberOfIterations = 1,
+                                setRandomSeed = 118337975
+                                )
+```
+
+With multiple different algorithms:
+
+```{r, eval=F}
+hypeRSpark::configureHyperSpark(setProblem = 'PfsProblem',
+                                data = 'inst_ta054.txt',
+                                setStoppingCondition = 'TimeExpired',
+                                stoppingValue = 1000,
+                                setAlgorithms = list("GAAlgorithm()", "SAAlgorithm(problem)"),
+                                setNDefaultInitialSeeds = 2,  # because no seed
+                                setDeploymentLocalNumExecutors = 2,
                                 setNumberOfIterations = 1,
                                 setRandomSeed = 118337975
                                 )
