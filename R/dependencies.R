@@ -7,14 +7,11 @@
 #'
 #' @return NULL
 #'
-#' @examples install_dependencies()
+#' @examples dependencies()
 #'
 #' @export dependencies
 
-dependencies <- function(scala=F, maven=F){
-  # Add code to install scala, maven, etc. Can be difficult as they have to be
-  # added to path as well.
-
+dependencies <- function(){
   install_hyperspark <- function(){
     # Download and unzip HyperSpark from github
     f = "https://github.com/jarnos97/hyperspark-1/archive/refs/heads/master.zip"

@@ -2,13 +2,9 @@
 #'
 #' @description Executes HyperSpark.
 #'
-#' @param execution_ouput If set to TRUE the terminal output of the execution
-#'   process is shown in the console, mainly useful for developing and
-#'   debugging. The default value is FALSE.
-#'
 #' @return NULL
 #'
-#' @examples execute_jar()
+#' @examples executeHyperSpark()
 #'
 #' @export executeHyperSpark
 

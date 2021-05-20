@@ -1,10 +1,10 @@
 ---
-title: "HypeRSpark vignette"
-author: "Jarno E. Smit"
+title: "HypeRSpark Package Vignette"
+author: "Author: Jarno E. Smit"
 package: "HypeRSpark"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{HypeRSpark-vignette}
+  %\VignetteIndexEntry{HypeRSpark Package Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,11 +20,16 @@ knitr::opts_chunk$set(
 library(hypeRSpark)
 ```
 
-# Introduction
+# 1. Introduction
 
-## Installing the package
-Can be installed directly from GitHub, using the *devtools* package. Building the vignettes relies on the *markdown* package.
-The code below illustrates how the packages can be downloaded and installed from GitHub.
+Why was the package created.
+What is the use?
+Which functions are there?
+
+
+## 1.1 Installing the package
+Can be installed directly from GitHub, using the *devtools* package. Building the vignette relies on the *rmarkdown* package.
+The code below illustrates how the packages can be downloaded and installed from GitHub, assuming devtools and rmarkdown have not been installed. Building the vignette can be time consuming, thus the parameter can be set to FALSE to save time. 
 
 ```{r, eval=F}
 install.packages("devtools")
@@ -33,16 +38,19 @@ devtools::install_github("jarnos97/rPackageHypeRSpark", build_vignettes = TRUE)
 ```
 
 
-Why was the package created.
-What is the use?
-Which functions are there?
 
 
-# Functions
 
-## Install dependencies
+# 2. Functions
 
-HyperSpark has the following external dependencies:
+## 2.1 dependencies
+
+The package relies on the HyperSpark framework. Consequently, its source code should be downloaded.
+The package function *dependencies()* downloads the most recent source code from GitHub to the working directory.
+The source code is later used to package and execute the framework from R, after user configuration.
+Consequently, it is recommended that users use a dedicated project directory when developing HypeRSpark applications.
+
+HyperSpark is Scala-Based, consequently Java Runtime Environment (JRE) (version1.6 or later) is required. Moreover, Scala requires the Java Developer Kit (JDK) to be installed, which includes JRE. Consequently, users exclusively need to install JDK. HyperSpark is packaged to a jar using Apache Maven. Maven is a Java tool and thus also requires a Java installation. The R package thus has two external dependencies:
 
 * Java SE Development Toolkit (JDK): the package was build using version 8 - update 281. 
 However, it keeps compatibility with newer versions. This requires a (free) Oracle account.
@@ -55,13 +63,148 @@ Users should install these dependencies and add both Java and Maven to the syste
 the same method is used for Maven.
 
 
-## Configuring hyperspark
+
+## 2. configureHyperSpark
+
+### HyperSpark parameters
+The parameters that can be defined in the framework configuration (through the *configureHyperSpark* function) are given in the table below. Mandatory parameters are marked with an asterisk. Most attributes are self-explainable, the others are briefly described. Examples usage of the parameters can be found further in this chapter. 
+
+HyperSpark uses the attributes *setAlgorithms* to set an array of (different) algorithms or *setNAlgorithms* to set some $N$ instances of a single algorithm. In the R-interface, only the function *setAlgorithms* is implemented. Users can either parse an array of algorithms or a single one. In the latter case users should define the number of algorithm instances using the optional parameter *numOfAlgorithms*. The parameter *setInitialSeeds* provides initial seeds (solutions) to the algorithms, and *setNInitialSeeds* provides $N$ initial seed instances. *setNDefaultInitialSeeds* passes a None seed to $N$ algorithms, meaning that it does not require it. The parameter *setNumberOfIterations* is set to 1 by default, which means that the algorithm is distributed and executed in parallel without any form of cooperation. The difference between execution of parallel independent algorithms and cooperative algorithms is determine by the number of iterations performed by the framework. 
+
+Furthermore, there are a number of parameters specific to the R-interface. Their names do not begin with 'set'. They are: data, stoppingValue, and numOfAlgorithms. 
+
+The algorithms are problem specific. Users should check in HyperSpark source files which algorithms are currently implemented for the problem. The currently implemented algorithms and their required arguments are shown in section xx.
+
+| Parameter               | Options                | Description |
+|:----------              |:-----------            |:------------------|
+| setProblem*             | PfsProblem, NrProblem  | An implemented problem, such as the PFSP. Should be the full name of the class.    |  
+| data*                   | Data file              |   -      |   
+| setStoppingCondition*   |    TimeExpired         |     -    |   
+| stoppingValue*          | Int (milliseconds)     | - |
+| setAlgorithms*          | Problem specific       | Are problem specific. All algorithms are defined as their name + Algorithm, i.e. 'ACOAlgorithm'.|
+| numOfAlgorithms         | Int                    | - |
+| setRandomSeed           | Int                    | Ensures reproducibility of results. |
+| setInitialSeeds         | ?                      | -| 
+| setNInitialSeeds        | Array                  | - |
+| setNDefaultInitialSeeds | Int                    | - | 
+| setSeedingStrategy      | Problem specific       | - | 
+| setNumberOfIterations   | Int                    | - | Iterations to be performed in one run, default: 1. Used for cooperative algorithms.|
+| setProperty             | ?                      | ? |
+| setMapReduceHandler     | ?                      | ? | 
+\* mandatory parameter
+
+### Spark parameters
+Besides the framework-specific parameters a number of Spark properties, displayed in the table below, can be defined. The function *setSparkMaster* sets the master URL for the cluster and *setAppName* defines a name for the application. *setNumberOfExecutors* determines the number of number of executors and is thus responsible for scaling the executing of algorithms. When a user sets an array of algorithms in FrameworkConf, the number of executors is internally called to pass the number of executors to the Spark environment. *setNumberOfResultingRDDPartitions* determines the number of partitions of an RDD when this number is not provided by the user. This function sets number of RDD partitions to the size of the algorithm array (and thus the amount of executors). 
+
+Execution can be either local or on a cluster. The local mode enables users to execute the application on a local machine, which is useful during development. The local mode has three options. First, *setDeploymentLocalNoParallelism* sets the number of executors to one, enabling sequential execution. Second, *setDeploymentLocalNumExecutors* sets the number of executors to a specified number. 
+Third, *setDeploymentLocalMaxCores* sets the number of executors to the amount of cores in the local machine.
+
+Cluster modes differ in resource manager, there are three available resource managers. First, *setDeploymentSpark* sets the resource manager to Sparks' Standalone version. Second, *setDeploymentMesos* sets the resource manager to Mesos. The third option is YARN, which has two additional modes. In the mode *setDeploymentYarnClient* the Spark driver runs in the client process and the applications master is used to request resources from YARN. In the mode *setDeploymentYarnCluster* the Spark driver runs inside an application master process which is managed by YARN on the cluster (more information [here](https://spark.apache.org/docs/latest/running-on-yarn.html).
+
+| Parameter                        | Options    | Description                                          |
+|:---------------------------------|:-----------|:-----------------------------------------------------|
+| setSparkMaster                   | String     | Cluster UR                                           |  
+| setAppName                       | String     | Application name                                     |
+| setNumberOfExecutors             | Int        | Number of executors                                  |
+| setNumberOfResultingRDDPartition | Int        | Number of partitions of an RDD                       | 
+| setDeploymentLocalNoParallelism  | True/False | Local and sequential execution on a single processor |
+| setDeploymentLocalNumExecutors   | Int        | Local execution on $N$ executors                     |
+| setDeploymentLocalMaxCores       | -          | Local execution on all available executors           |
+| setDeploymentSpark               | True/False | Cluster execution standalone resource manager        | 
+| setDeploymentMesos               | True/False | Cluster execution Mesos resource manager             |
+| setDeploymentYarnClient          | True/False | Cluster execution YARN resource manager client mode  |
+| setDeploymentYarnCluster         | True/False | Cluster execution YARN resource manager cluster mode |
 
 
-## packageHyperSpark
+
+### Algorithms
+
+The table below shows the implemented algorithms per problem, including their arguments. Initial seeds are excluded from the arguments, as almost every algorithm excepts it. Algorithms should be defined as a string, including parentheses with arguments. Default values are set for the algorithms, meaning arguments are not mandatory. Users can decide which arguments to change. If an algorithm does not require arguments, parenthesis are *still* required. Some example definitions are:
+
+```{r, eval=F}
+setAlgorithms = 'GAAlgorithm(popSize = 30, crossRate = 1.0, mutRate = 0.8, 
+                             mutDecreaseFactor = 0.99, mutResetThreshold = 0.95, 
+                             seedOption = None)'
+
+setAlgorithms = 'GAAlgorithm()'
+
+setAlgorihtms =  'SAAlgorithm(initT = 100.0, minT = 0.001, b = 0.0000005, 
+                              totalCosts = 820, boundPercentage = 0.3)'
+```
+
+
+| Problem | Algorithm                                   | Argument                     | Argument name     |
+|:--------|:-----------------                           |:------------------           |:------------------|
+| PFS     | NEH (NEHAlgorithm)                          | -                            | - | 
+|         | Iterated Greedy (IGAlgorithm)               | d                            | d |
+|         |                                             | T                            | T | 
+|         | Genetic Algorithm (GAAlgorithm)             | Population size              | popSize |
+|         |                                             | Cross-over rate              | crossRate |
+|         |                                             | Mutation rate                |  mutRate  |
+|         |                                             | Mutation decrease factor     | mutDecreaseFactor | 
+|         |                                             | Mutation reset threshold     | mutResetThreshold | 
+|         | Hybrid Genetic Algorithm (HGAAlgorithm)     | Problem                      | p | 
+|         |                                             | Population size              | popSize |
+|         |                                             | Probability                  | prob | 
+|         |                                             | Cooling rate                 | coolingRate | 
+|         |Simulated Annealing (SAAlgorithm)            | Problem                      | p |
+|         |                                             |  Initial temperature         | tUB |
+|         |                                             | Minimum temperature          | tLB |
+|         |                                             | Cooling rate                 | cRate |
+|         | Improved Simulated Annealing (ISAAlgorithm) | Problem                      | p | 
+|         |                                             | Initial temperature          | tUB | 
+|         |                                             | Minimum temperature          | tLB |
+|         |                                             | Cooling rate                 | cRate |
+|         |                                             | Max. not changed temperature | mncTemp |
+|         |                                             | Max. not changed MS          |  mncMS |
+|         |                                             | Max iterations per MS        | mitpMS |
+|         | Taboo Search (TSAlgorithm)                  | Max. taboo list size         | maxTabooListSize |
+|         |                                             | Number of random moves       | numOfRandomMoves |
+|         | Ant Colony Optimization (ACO)               | Problem                      | p | 
+|         |                                             | Pheromone trail              | t0 |
+|         | Max Min Ant System (MMASAlgorithm)          | Problem                      | p | 
+|         |                                             | Pheromone trail              | t0 |
+|         | m-MMAS (MMMASAlgorithm)                     | Problem                      | p | 
+|         |                                             | Pheromone trail              | t0 |
+|         |                                             | Candidate                    | cand |
+|         | PACO (PACOAlgorithm)                        | Problem                      | p | 
+|         |                                             | Pheromone trail              | t0 |
+|         |                                             | Candidate                    | cand |
+| NRP     | Simulated Annealing (SAAlgorithm)           | Initial Temperature          | initT |
+|         |                                             | Minimum temperature          | minT |
+|         |                                             | beta                         | b |
+|         |                                             | Total costs | totalCosts     |
+|         |                                             | Bound as percentage          | boundPercentage | 
+   
+### Example Configurations
+
+The following code executes the Permutation Flow Shop Problem. Four local parallel instances of the Genetic Algorithm are instantiated, for 1 iteration of 5 minutes.  
+
+```{r, eval=F}
+hypeRSpark::configureHyperSpark(setProblem = 'PfsProblem',
+                                data = 'inst_ta054.txt',
+                                setStoppingCondition = 'TimeExpired',
+                                stoppingValue = 300000,
+                                setAlgorithms = 'GAAlgorithm(popSize = 30, crossRate = 1.0, 
+                                                             mutRate = 0.8, mutDecreaseFactor = 0.99,
+                                                             mutResetThreshold = 0.95, 
+                                                             seedOption = None)',
+                                setNDefaultInitialSeeds = 4,  # no seed
+                                numOfAlgorithms = 4,
+                                setDeploymentLocalNumExecutors = 4,
+                                setNumberOfIterations = 1,
+                                setRandomSeed = 118337975
+                                )
+```
+
+
+
+## 3. packageHyperSpark
 
 The first time running this command can take a while, as all dependencies need  to be downloaded
 from the Maven repository. Subsequent packaging is much faster. 
 
+## 4. executeHyperSpark
+Local or cluster mode.
 
 

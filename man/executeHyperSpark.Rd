@@ -6,15 +6,10 @@
 \usage{
 executeHyperSpark()
 }
-\arguments{
-\item{execution_ouput}{If set to TRUE the terminal output of the execution
-process is shown in the console, mainly useful for developing and
-debugging. The default value is FALSE.}
-}
 \description{
 Executes HyperSpark.
 }
 \examples{
-execute_jar()
+executeHyperSpark()
 
 }

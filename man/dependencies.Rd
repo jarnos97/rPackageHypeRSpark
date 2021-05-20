@@ -4,7 +4,7 @@
 \alias{dependencies}
 \title{Install dependencies}
 \usage{
-dependencies(scala = F, maven = F)
+dependencies()
 }
 \arguments{
 \item{NULL}{}
@@ -14,6 +14,6 @@ Installs the dependencies, including HyperSpark source code from
   Github.
 }
 \examples{
-install_dependencies()
+dependencies()
 
 }

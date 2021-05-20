@@ -6,7 +6,7 @@
 #'
 #' @return NULL
 #'
-#' @examples package()
+#' @examples packageHyperSpark()
 #'
 #' @export packageHyperSpark
 

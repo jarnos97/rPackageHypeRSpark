@@ -13,6 +13,6 @@ packageHyperSpark()
 Executes HyperSpark.
 }
 \examples{
-package()
+packageHyperSpark()
 
 }
