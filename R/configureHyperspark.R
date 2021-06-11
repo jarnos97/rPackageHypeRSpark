@@ -88,6 +88,11 @@ import java.io._
       alg_import <- sprintf("import %sp.algorithms.%s", problemPath, alg)
       write(alg_import, class_file, append = T)
     }
+
+    if (setMapReduceHandler != NONE){
+      mp_import <- sprintf("import it.polimi.hyperh.spark.%s", setMapReduceHandler)
+      write(mp_import, class_file, append = T)
+    }
   }  # end addImports
 
 
@@ -104,7 +109,7 @@ object MainClass{
   # Define the necessary variables
   defineVariables <- function(){
     # Define problem
-    defProblem <- sprintf('    val problem = %s.fromResources(name="%s")',
+    defProblem <- sprintf('    val problem = %s.fromResources(fileName="%s")',
                           setProblem, data)  # fromResources is problem specific!
     write(defProblem, class_file, append = T)
     # Define algorithms
@@ -190,18 +195,17 @@ object MainClass{
       }
       index <- index + 1
     }
-    # Set the optional parameters.
+    # Set the optional parameters. Except seeding strategy
     param_names <- c('setNumberOfIterations', 'setInitialSeeds',
                      'setInitialSeeds', 'setNDefaultInitialSeeds',
-                     'setSeedingStrategy', 'setProperty',
-                     'setMapReduceHandler', 'setRandomSeed', 'setSparkMaster',
-                     'setAppName', 'setNumberOfExecutors',
+                     'setProperty', 'setRandomSeed',
+                     'setSparkMaster', 'setAppName', 'setNumberOfExecutors',
                      'setNumberOfResultingRDDPartitions')
     optional_params <- c(setNumberOfIterations, setInitialSeeds,
                          setNInitialSeeds, setNDefaultInitialSeeds,
-                         setSeedingStrategy, setProperty, setMapReduceHandler,
-                         setRandomSeed, setSparkMaster, setAppName,
-                         setNumberOfExecutors,setNumberOfResultingRDDPartitions)
+                         setProperty, setRandomSeed,
+                         setSparkMaster, setAppName, setNumberOfExecutors,
+                         setNumberOfResultingRDDPartitions)
     # Write all defined parameters to file
     index <- 1
     for (param in optional_params){
@@ -211,6 +215,22 @@ object MainClass{
       }
       index <- index + 1
     }
+
+    # Set seeding strategy
+    if (setSeedingStrategy != NONE){
+      s_str <- sprintf('      .setSeedingStrategy(new %s)', setSeedingStrategy)
+      write(s_str, class_file, append = T)
+    }
+
+    # Set MapReduce handler
+    if (setMapReduceHandler != NONE){
+      s_str <- sprintf('      .setMapReduceHandler(new %s())', setMapReduceHandler)
+      write(s_str, class_file, append = T)
+    }
+
+
+
+
   } # End configuration
 
   # Add constant ending
