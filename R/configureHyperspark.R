@@ -93,6 +93,16 @@ import java.io._
       mp_import <- sprintf("import it.polimi.hyperh.spark.%s", setMapReduceHandler)
       write(mp_import, class_file, append = T)
     }
+
+    if (setSeedingStrategy != NONE){
+      ss <- strsplit(setSeedingStrategy, "\\(")[[1]][1]  # Extract seeding strategy
+      if (ss == 'SameSeeds'){
+        ss_import <- sprintf("import it.polimi.hyperh.spark.%s", ss)
+      } else {
+        ss_import <- sprintf("import %sp.spark.%s", problemPath, ss)
+      }
+      write(ss_import, class_file, append = T)
+    }
   }  # end addImports
 
 
@@ -109,7 +119,7 @@ object MainClass{
   # Define the necessary variables
   defineVariables <- function(){
     # Define problem
-    defProblem <- sprintf('    val problem = %s.fromResources(fileName="%s")',
+    defProblem <- sprintf('    val problem = %s.fromResources(name="%s")',
                           setProblem, data)  # fromResources is problem specific!
     write(defProblem, class_file, append = T)
     # Define algorithms
@@ -187,7 +197,7 @@ object MainClass{
         if (deployment == T){  # if there is no parameter for the deployment mode
           defDeployment <- sprintf('      .%s()', deployment_names[index])
         } else {  # if there is a parameter
-          defDeployment <- sprintf('      .%s(%s)', deployment_names[index],
+          defDeployment <- sprintf('      .%s%s', deployment_names[index],
                                                     deployment)
         }
         write(defDeployment, class_file, append = T)

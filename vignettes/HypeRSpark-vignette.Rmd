@@ -11,6 +11,13 @@ vignette: >
 
 <!-- \pagenumbering{gobble} -->
 
+<!-- Change font size of table -->
+<!-- <style type="text/css"> -->
+<!-- td {  /* Table  */ -->
+<!--   font-size: 10px; -->
+<!-- } -->
+<!-- </style> -->
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -24,9 +31,9 @@ library(hypeRSpark)
 
 # 1. Introduction
 
-The HypeRSpark R-package has been created to provide a simple R-interface for the HyperSpark framework; a data-intensive programming environment for parallel metaheuristics. A limitation of R is that objects are stored in main memory (RAM). Additionally, R imposes a limit of $2^{31}$ - 1 bytes on the size of a single object. Consequently, the problem size is very limited. For some applications this limitation be overcome through *chunking* or through the use of dedicated R packages for memory management. However, for very large datasets this is not always a viable option. An additional limitation of R is that the language is interpreted and thus often runs significantly slower compared to compiled languages, such as Java, C, or Fortran. As a consequence, computationally intensive algorithms in R are commonly developed in compiled languages. Since R is relatively slow and lacks scalability, it might not seem an ideal candidate for high-performance computation. Nonetheless, at the time of writing it is the sixth most popular programming language in the IEEE spectrum ranking. To overcome the limitations of R, a number of techniques have been introduced. R was originally developed to be single-threaded. However, a number of libraries have been developed for parallel computation, such as the *parallel* package (which now comes with base R) and the *snow* package. Furthermore, the Programming with Big Data in R (pbdR) project was developed for processing Big Data and large-scale distributed computing.Spark also provides an API for running R applications. Moreover, Apache introduced SparkR; a package functioning as a light-weight interface for Spark in R. As a result of these developments, R has become a suitable tool for Big Data programming.
+The HypeRSpark R-package has been created to provide a simple R-interface for the HyperSpark framework; a data-intensive programming environment for parallel metaheuristics. A limitation of R is that objects are stored in main memory (RAM). Additionally, R imposes a limit of $2^{31}$ - 1 bytes on the size of a single object. Consequently, the problem size is very limited. For some applications this limitation be overcome through *chunking* or through the use of dedicated R packages for memory management. However, for very large datasets this is not always a viable option. An additional limitation of R is that the language is interpreted and thus often runs significantly slower compared to compiled languages, such as Java, C, or Fortran. As a consequence, computationally intensive algorithms in R are commonly developed in compiled languages. Since R is relatively slow and lacks scalability, it might not seem an ideal candidate for high-performance computation. Nonetheless, at the time of writing it is the sixth most popular programming language in the IEEE spectrum ranking. To overcome the limitations of R, a number of techniques have been introduced. R was originally developed to be single-threaded. However, a number of libraries have been developed for parallel computation, such as the *parallel* package (which now comes with base R) and the *snow* package. Furthermore, the Programming with Big Data in R (pbdR) project was developed for processing Big Data and large-scale distributed computing. Spark also provides an API for running R applications. Moreover, Apache introduced SparkR; a package functioning as a light-weight interface for Spark in R. As a result of these developments, R has become a suitable tool for Big Data programming.
 
-In addition to traditional statistics, R is increasingly used for computational methods such as Machine Learning and Optimization. Consequently, it is no surprise that a dedicated package for metaheuristics has been implemented, namely *Metaheuristic for optimization* (or metaheuristicOpt in short). The package consists of a number of metaheuristic algorithms for continuous optimization. Although the package is easy to use, due to its 'plug-and-play' nature, it lacks flexibility. Furthermore, the package is not build for large scale optimization. Users dealing with large and/or complex problems are required to manually set up a big data pipeline for their algorithms. HyperSpark overcomes this limitation by offering a flexible framework for large scale, data-intensive, and distributed optimization. Consequently, aim of this package is to create a HyperSpark interface for R.
+In addition to traditional statistics, R is increasingly used for computational methods such as Machine Learning and Optimization. Consequently, it is no surprise that a dedicated package for metaheuristics has been implemented, namely *Metaheuristic for optimization* (or metaheuristicOpt in short). The package consists of a number of metaheuristic algorithms for continuous optimization. Although the package is easy to use, due to its 'plug-and-play' nature, it lacks flexibility. Furthermore, the package is not build for large scale optimization. Users dealing with large and/or complex problems are required to manually set up a big data pipeline for their algorithms. HyperSpark overcomes this limitation by offering a flexible framework for large scale, data-intensive, and distributed optimization. Consequently, aim of this package is to offer a HyperSpark interface for R.
 
 The package allows users to easily create an application in HyperSpark for the distributed execution of metaheuristics. The intention is that through the open-source nature of HyperSpark, more problems and algorithms will be implemented in the future, which can then be applied in this package. The R package is structured around four main functions: installing HyperSpark's source code, configuring HyperSpark, packaging, and execution. Users can select a problem, algorithm(s), and configure the framework based on their needs. Subsequently, the framework is packaged to a JAR archive. Upon execution the framework either connects to a JVM instance and executes HyperSpark, in the case of local execution, or the user submits the packaged framework to a cluster with Spark, in case of distributed execution. The following section describes how the package can be installed. Next, the subsequent chapter describes each of the four main functions, in order of execution, in more detail. Please note that the package has currently only been tested for Windows systems.  
 
@@ -47,7 +54,7 @@ devtools::install_github("jarnos97/rPackageHypeRSpark", build_vignettes = TRUE)
 
 ## 2.1 dependencies
 
-The package relies on the HyperSpark framework. Consequently, its source code should be downloaded. The package function *dependencies()* downloads the most recent HyperSpark version from GitHub to the working directory. The source code is later used to package and execute the framework from R, after user configuration. Consequently, it is recommended that users use a dedicated project directory when developing HypeRSpark applications.
+The package relies on the HyperSpark framework. Consequently, its source code should be downloaded. The package function *dependencies()* downloads and unpacks the most recent HyperSpark version from GitHub to the working directory. The source code is later used to package and execute the framework from R, after user configuration. Consequently, it is recommended that users use a dedicated project directory when developing HypeRSpark applications. Executing the function creates a folder, called *HyperSpark-master*, containing the source code.
 
 HyperSpark is Scala-based, consequently Java Runtime Environment (JRE) (version1.6 or later) is required. Moreover, Scala requires the Java Developer Kit (JDK) to be installed, which includes JRE. Consequently, users exclusively need to install JDK to use the package. Furthermore, the framework is packaged to a JAR archive using [Apache Maven](https://maven.apache.org/). The R package thus has two external dependencies. In order to use this package, users are required to install these external dependencies. Furthermore, it is important that both Java and Maven are added to the system's path. [This tutorial](https://javatutorial.net/set-java-home-windows-10) shows how to add Java to the system path for Windows 10, the same method is used for Maven. Below, links to download pages for the dependencies are given. The method of installation depends on the users' operating system.
 
@@ -61,41 +68,44 @@ Download links [here.](https://www.oracle.com/nl/java/technologies/javase/javase
 
 ## 2.2 configureHyperSpark
 
-The *configureHyperSpark* function is the main gateway to the framework. The function consists of a large number of HyperSpark and Spark parameters which can be set by the user to create a customer HyperSpark application. A HyperSpark application mainly consists of a Problem and Algorithm(s) to solve it. The next two sub-sections discuss the HyperSpark and Spark parameters that can be set by the user. For the most up-to-date problems and algorithms, users should take a look at the [HyperSpark source code](https://github.com/deib-polimi/hyperspark). Furthermore, a number of example configurations are given. Users wanting a deeper understanding of the framework are referred to the following papers:
+The *configureHyperSpark* function is the main gateway to the framework. The function consists of a large number of HyperSpark and Spark parameters which can be set by the user to create a custom HyperSpark application. A HyperSpark application mainly consists of a Problem and Algorithm(s) to solve it. The next two sub-sections discuss the HyperSpark and Spark parameters that can be set by the user. For the most up-to-date problems and algorithms, users should take a look at the [HyperSpark source code](https://github.com/deib-polimi/hyperspark). Furthermore, a number of example configurations are given. Users wanting a deeper understanding of the framework are referred to the following papers:
 
 * STOLIC, N. (2016). *HyperSpark: a framework for scalable execution of computationally intensive algorithms over Spark.*
 * Ciavotta, M., Krstić, S., Tamburri, D. A., & Van Den Heuvel, W. J. (2019, July). *HyperSpark: A Data-Intensive Programming Environment for Parallel Metaheuristics.* In 2019 IEEE International Congress on Big Data (BigDataCongress) (pp. 85-92). IEEE.
 
+*General note*: when setting parameters with strings inside strings, use double quotation marks for the inner string. I.e. setAppName = '("MyApp")'.
 
 ### HyperSpark parameters
-The parameters that can be defined in the framework configuration (through the *configureHyperSpark* function) are given in the table below. Mandatory parameters are marked with an asterisk. Examples usage of the parameters can be found further in this chapter. As previously stated, users need to define the problem they aim to solve, which can be achieved through the *setProblem* parameter. At the time of writing three optimization problems have been implemented: the Permutation Flow Shop Problem, the Next Release Problem, and the Knapsack Problem. Next, users should define the data to which the problem should be applied. A number of example problem instances are included with the framework, which can be found in the folder *src/main/resources*. However, users can also add their own data by simply adding their files to the aforementioned folder.
+The parameters that can be defined in the framework configuration (through the *configureHyperSpark* function) are given in the table below. Mandatory parameters are marked with an asterisk. Example of the parameters are given in the table, as well as later in this chapter. As previously stated, users need to define the problem they aim to solve, which can be achieved through the *setProblem* parameter. At the time of writing three optimization problems have been implemented: the Permutation Flow Shop Problem, the Next Release Problem, and the Knapsack Problem. Next, users should define the data to which the problem should be applied. A number of example problem instances are included with the framework, which can be found in the folder *src/main/resources*. However, users can also add their own data by simply adding their files to the aforementioned folder.
 
-In addition, a stopping condition should be set using *setStoppingCondition*. Currently, the only global stopping condition is *TimeExpired*, which denotes a maximum execution time per algorithm (per iteration). Furthermore, a corresponding stopping value should be defined using *stoppingValue*. For TimeExpired this is an integer of milliseconds. HyperSpark uses the attributes *setAlgorithms* to set an array of (different) algorithms or *setNAlgorithms* to set some $N$ instances of a single algorithm. In the R-interface, only the function *setAlgorithms* is implemented. Users can either parse an array of algorithms or a single one. In the latter case users should define the number of algorithm instances using the optional parameter *numOfAlgorithms*. The algorithms are problem specific. Users should check in HyperSpark source files which algorithms are currently implemented for the problem. However, the algorithms at the time of writing are shown in a following section.
+In addition, a stopping condition should be set using *setStoppingCondition*. Currently, the only global stopping condition is *TimeExpired*, which denotes a maximum execution time per algorithm **per iteration**. Furthermore, a corresponding stopping value should be defined using *stoppingValue*. For TimeExpired this is an integer of **milliseconds**. HyperSpark uses the attributes *setAlgorithms* to set an array of (different) algorithms or *setNAlgorithms* to set some $N$ instances of a single algorithm. In the R-interface, only the function *setAlgorithms* is implemented. Users can either parse an array of algorithms or a single one. In the latter case users should define the number of algorithm instances using the optional parameter *numOfAlgorithms*. The algorithms are problem specific. Users should check in HyperSpark source files which algorithms are currently implemented for the problem. However, the algorithms at the time of writing are shown in a following section.
 
-The parameter *setInitialSeeds* provides initial seeds (solutions) to the algorithms, and *setNInitialSeeds* provides $N$ initial seed instances. *setNDefaultInitialSeeds* passes a None seed to $N$ algorithms, meaning that it does not require it. The parameter *setNumberOfIterations* is set to 1 by default, meaning that algorithms are execute once, until the stopping condition is met, without any cooperation between algorithms. Cooperation between algorithms can be implemented by increasing the number of iteration and defining a *seeding strategy*. Seeding strategies are discussed further in this chapter.  that the algorithm is distributed and executed in parallel without any form of cooperation. 
+The parameter *setInitialSeeds* provides initial seeds (solutions) to the algorithms, and *setNInitialSeeds* provides $N$ initial seed instances. *setNDefaultInitialSeeds* passes a None seed to $N$ algorithms, meaning that it does not require it. *Please note* that users should always set (exactly) one of *setInitialSeeds*, *setNInitialSeeds*, or *setNDefaultInitialSeeds*. *setInitialSeeds* should be an array with the same amount of initial seeds as parallel algorithms. In contrast, for *setNInitialSeeds* and *setNDefaultInitialSeeds* the integer $N$ should be set to the amount of parallel algorithms. 
+
+The parameter *setNumberOfIterations* is set to 1 by default, meaning that algorithms are execute once, until the stopping condition is met, without any cooperation between algorithms. Cooperation between algorithms can be implemented by increasing the number of iteration and defining a *seeding strategy*. Seeding strategies are discussed further in this chapter.  that the algorithm is distributed and executed in parallel without any form of cooperation. 
 
 The parameter *setMapReduceHandler* controls the way evaluated solutions are selected in the reduce phase. The default value, *MapReduceHandler*, selects the evaluated solution with the lowest value. Consequently, this MapReduce handler should be used for minimization problems (i.e. PFS). Since  *MapReduceHandler* is the default value, the *setMapReduceHandler* parameter does not need to be set for minimization problems. In contrast, *MapReduceHandlerMaximization* selects the evaluated solution which the highest value and should thus be selected for maximization problems (i.e. NRP and KP).
 
 
-| Parameter               | Options                           | Description |
-|:----------              |:-------------                     |:------------------|
-| setProblem*             | PfsProblem, NrProblem, KpProblem  | An implemented problem, such as the PFSP. Should be the full name of the class.    |  
-| data*                   | Data file                         | Data for the problem.   |   
-| setStoppingCondition*   | TimeExpired                       | Maximum computation time per iteration    |   
-| stoppingValue*          | Int                               | Milliseconds |
-| setAlgorithms*          | Problem specific                  | Are problem specific. All algorithms are defined as their name + Algorithm, i.e. 'ACOAlgorithm'.|
-| numOfAlgorithms         | Int                               | The number of parallel algorithms |
-| setRandomSeed           | Int                               | Ensures reproducibility of results. |
-| setInitialSeeds         | Array                             | Provide an array of solutions for nodes| 
-| setNInitialSeeds        | Array (Solution) + int            | Provide a single solution, distributed to $N$ nodes|
-| setNDefaultInitialSeeds | Int                               | Provide NONE seed to $N$ nodes | 
-| setSeedingStrategy      | Problem specific                  | Define a seeding strategy | 
-| setNumberOfIterations   | Int                               | Iterations to be performed in one run, default 1. Used for cooperative algorithms.|
-| setMapReduceHandler     | MapReduceHandler, MapReduceHandlerMaximization  | MapReduce handler for minimization and maximization problems. | 
+| Parameter               | Options                           | Description |       Example |
+|:----------              |:-------------                     |:------------------|:----------|
+| setProblem*             | PfsProblem, NrProblem, KpProblem  | An implemented problem, such as the PFSP. Should be the full name of the class, as a string.    |  'PfsProblem' |
+| data*                   | Data file                         | Data for the problem. More info in the problem description  | 'inst_ta054.txt' |  
+| setStoppingCondition*   | TimeExpired                       | Maximum computation time per iteration    | 'TimeExpired' |
+| stoppingValue*          | Int                               | in **Milliseconds** | 180000 |
+| setAlgorithms*          | Problem specific                  | Are problem specific. All algorithms are defined as their name + Algorithm + parentheses and arguments, as a string. | "TSAlgorithm(maxTabooListSize=7)" | 
+| numOfAlgorithms         | Int                               | The number of parallel algorithms | 20 |
+| setRandomSeed           | Int                               | Ensures reproducibility of results. | 12244 |
+| setInitialSeeds         | Array                             | Provide an array of solutions for nodes| (seed, seed, ..., N) |
+| setNInitialSeeds        | Array (Solution) + int            | Provide a single solution, distributed to $N$ nodes| (seed, 20) |
+| setNDefaultInitialSeeds | Int                               | Provide NONE seed to $N$ nodes | 20 |
+| setSeedingStrategy      | Problem specific                  | Define a seeding strategy | 'SameSeeds()' |
+| setNumberOfIterations   | Int                               | Iterations to be performed in one run, default 1. Used for cooperative algorithms.| 6 |
+| setMapReduceHandler     | MapReduceHandler, MapReduceHandlerMaximization  | MapReduce handler for minimization and maximization problems. | 'MapReduceHandlerMaximization' | 
 \* mandatory parameter
 
 ### Spark parameters
-Besides the framework-specific parameters a number of Spark properties, displayed in the table below, can be defined. All Spark parameters are optional. Users will generally specify these argument when executing their application on a cluster, using [spark-submit](https://spark.apache.org/docs/latest/submitting-applications.html) However, it is good to note that the arguments can be configured in advance using the Spark parameters described below. 
+Besides the framework-specific parameters a number of Spark properties, displayed in the table below, can be defined. All Spark parameters are optional. Users will generally specify these argument when executing their application on a cluster, using [spark-submit](https://spark.apache.org/docs/latest/submitting-applications.html) However, it is good to note that the arguments can be configured in advance using the Spark parameters described below. All Spark parameters are defined as a string with arguments within parentheses (e.g. setNumberOfExecutors = '(4)') or TRUE if there are no parameters (e.g. setDeploymentLocalNoParallelism = TRUE)
 
 The function *setSparkMaster* sets the master URL for the cluster and *setAppName* defines a name for the application. *setNumberOfExecutors* determines the number of number of executors and is thus responsible for scaling the executing of algorithms. When a user sets an array of algorithms in FrameworkConf, the number of executors is internally called to pass the number of executors to the Spark environment. *setNumberOfResultingRDDPartitions* determines the number of partitions of an RDD when this number is not provided by the user. This function sets number of RDD partitions to the size of the algorithm array (and thus the amount of executors). 
 
@@ -104,23 +114,23 @@ Third, *setDeploymentLocalMaxCores* sets the number of executors to the amount o
 
 Cluster modes differ in resource manager, there are three available resource managers. First, *setDeploymentSpark* sets the resource manager to Sparks' Standalone version. Second, *setDeploymentMesos* sets the resource manager to Mesos. The third option is YARN, which has two additional modes. In the mode *setDeploymentYarnClient* the Spark driver runs in the client process and the applications master is used to request resources from YARN. In the mode *setDeploymentYarnCluster* the Spark driver runs inside an application master process which is managed by YARN on the cluster (more information [here](https://spark.apache.org/docs/latest/running-on-yarn.html)).
 
-| Parameter                        | Options    | Description                                          |
-|:---------------------------------|:-----------|:-----------------------------------------------------|
-| setSparkMaster                   | String     | Cluster URL                                          |  
-| setAppName                       | String     | Application name                                     |
-| setNumberOfExecutors             | Int        | Number of executors                                  |
-| setNumberOfResultingRDDPartition | Int        | Number of partitions of an RDD                       | 
-| setDeploymentLocalNoParallelism  | True/False | Local and sequential execution on a single processor |
-| setDeploymentLocalNumExecutors   | Int        | Local execution on $N$ executors                     |
-| setDeploymentLocalMaxCores       | -          | Local execution on all available executors           |
-| setDeploymentSpark               | -          | Cluster execution standalone resource manager        | 
-| setDeploymentMesos               | -          | Cluster execution Mesos resource manager             |
-| setDeploymentYarnClient          | -          | Cluster execution YARN resource manager client mode  |
-| setDeploymentYarnCluster         | -          | Cluster execution YARN resource manager cluster mode |
+| Parameter                        | Options    | Description                                          | Example |
+|:---------------------------------|:-----------|:-----------------------------------------------------|---------|
+| setSparkMaster                   | String     | Cluster URL                                          | '("spark://23.195.26.187:7077")'|  
+| setAppName                       | String     | Application name                                     | '("MyApp")' |
+| setNumberOfExecutors             | Int        | Number of executors                                  | '(4)' |
+| setNumberOfResultingRDDPartition | Int        | Number of partitions of an RDD                       | '(6)' |
+| setDeploymentLocalNoParallelism  | TRUE       | Local and sequential execution on a single processor | TRUE  | 
+| setDeploymentLocalNumExecutors   | Int        | Local execution on $N$ executors                     | '(4)' |
+| setDeploymentLocalMaxCores       | TRUE       | Local execution on all available executors           | TRUE |
+| setDeploymentSpark               | String     | Host. Cluster execution standalone resource manager  | '("spark://23.195.26.187")'
+| setDeploymentMesos               | String and/or Int | host and/or port Cluster execution Mesos resource manager| '("spark://23.195.26.187, 7077")' |
+| setDeploymentYarnClient          | TRUE | Cluster execution YARN resource manager client mode        | TRUE  |
+| setDeploymentYarnCluster         | TRUEE | Cluster execution YARN resource manager cluster mode      | TRUE |
 
 
 
-### Problems
+### Optimization Problems
 At the time of writing, three problems have been implemented in HyperSpark; the Permutation Flow Shop Problems (*PfsProblem*), the Next Release Problem (*NrProblem*), and the Knapsack Problem (*KpProblem*). This section briefly discusses the parameters for the problems. For an explanation of both problems, users are referred to the followings papers:
 
 * Samia Kouki, Mohamed Jemni, and Talel Ladhari. *Solving the Permutation Flow Shop Problem with Makespan Criterion using Grids.* International
@@ -130,7 +140,7 @@ Journal of Grid and Distributed Computing, 4, 2011.
 
 
 #### PfsProblem
-The PfsProblem requires users to define the number of jobs, number of machines, and a matrix of processing times. Users can save this information to a text file and load the parameters in directly, using the *data* parameter in the framework configuration. The data should have the same format as the examples problem instances in the resources folder, an example is given below.
+The PfsProblem requires users to define the number of jobs, number of machines, and a matrix of processing times. Users can save this information to a text file and load the parameters in directly, using the *data* parameter in the framework configuration. The *data* parameter should be a string containing the file name and extension (i.e. 'inst_ta054.txt'). The data should have the same format as the examples problem instances in the resources folder, an example is given below. The objective of this problem is to minimize the objective function, consequently the default *MapReduceHandler* should be utilized.
 
 ```{r, eval=F}
 20 5
@@ -145,11 +155,12 @@ The PfsProblem requires users to define the number of jobs, number of machines, 
 
 
 #### NrProblem
-The NrProblem requires users to define parameters (number of customers and number of levels), customer weights, customer requirements, node costs and node parents. Due to their size, each of these are saved in a separate file (the two parameters together), for clarity. These files should follow the following naming conventions. The file name should start with the name of the problem instance, followed by the specific file: Parameters, CustomerRequirements, CustomerWeights, NodeCosts, NodeParents. A file could thus be called 'NRP1NodeRequirements.txt'. Examples can be found in the *resources* folder in the HyperSpark source code. In the framework configuration, the *data* parameter should then be set to the name of the problem instance (i.e. NRP1).
+The NrProblem requires users to define parameters (number of customers and number of levels), customer weights, customer requirements, node costs and node parents. Due to their size, each of these are saved in a separate file (the two parameters together), for clarity. These files should follow the following naming conventions. The file name should start with the name of the problem instance, followed by the specific file: Parameters, CustomerRequirements, CustomerWeights, NodeCosts, NodeParents. A file could thus be called 'NRP1NodeRequirements.txt'. Examples can be found in the *resources* folder in the HyperSpark source code. In the framework configuration, the *data* parameter should then be set to the name of the problem instance (i.e. NRP1). The objective of this problem is to maximize the objective function, consequently the *MapReduceHandlerMaximization* should be utilized.
 
 
 #### KpProblem
-The KpProblem requires users to define a capacity, an array of item profits, and an array of item weights. These parameters should be saved to a single file, where the first line is the capacity an each subsequent line is the profit followed by the weight of an item (delimited with a space). Examples can be found in the *resources* folder in the HyperSpark source code, one is given below. In the framework configuration, the *data* parameter should then be set to the name of the problem instance (i.e. KP_500_100000).
+The KpProblem requires users to define a capacity, an array of item profits, and an array of item weights. These parameters should be saved to a single file, where the first line is the capacity an each subsequent line is the profit followed by the weight of an item (delimited with a space). Examples can be found in the *resources* folder in the HyperSpark source code, one is given below. In the framework configuration, the *data* parameter should then be set to a string including the name of the problem instance and the file-extension (i.e. 'KP_500_100000.txt'). The objective of this problem is to maximize the objective function, consequently the *MapReduceHandlerMaximization* should be utilized.
+
 
 ```{r, eval=F}
 252389
@@ -241,11 +252,11 @@ setSeedingStrategy = 'SeedPlusSlidingWindow(10)'
 
 | Problem | Seeding Strategy        | Argument    | Argument value    |
 |:--------|:-----------------       |:------------|:------------------|
-| PFS     | SameSeeds               | -           | - | 
-|         | SeedPlusSlidingWindow   | windowSize  | int |
-|         | SeedPlusFixedWindow     | windowSize  | int |
-| NRP     | SameSeeds               | -           | - | 
-| KP      | SameSeeds               | -           | - | 
+| PFS     | SameSeeds               | -           | -                 | 
+|         | SeedPlusSlidingWindow   | windowSize  | int               |
+|         | SeedPlusFixedWindow     | windowSize  | int               |
+| NRP     | SameSeeds               | -           | -                 | 
+| KP      | SameSeeds               | -           | -                 | 
 
 
 
@@ -253,7 +264,7 @@ setSeedingStrategy = 'SeedPlusSlidingWindow(10)'
 
 ### Example Configurations
 
-A number of example configurations are given below, to help the user in defining their own applications. The first example below applies the Permutation Flow Shop Problem on an included problem instance. Four local parallel instances of the Genetic Algorithm are instantiated, for 1 iteration of 5 minutes. No initial seed is set, thus, the parameter *setNDefaultInitialSeeds* is set to the amount of algorithms (i.e. 4). A random seed is set for replicability of results.  
+A number of example configurations are given below, to help the user in defining their own applications. The first example below applies the Permutation Flow Shop Problem on an included problem instance. Four local parallel instances of the Genetic Algorithm are instantiated, for 1 iteration of 5 minutes (300000 milliseconds). Since there is only one iteration, a seeding strategy is not applicable, as this determines cooperation between algorithms between iterations. No initial seed is set, thus, the parameter *setNDefaultInitialSeeds* is set to the amount of algorithms (i.e. 4). A random seed is set for replication of results.  
 
 ```{r, eval=F}
 hypeRSpark::configureHyperSpark(setProblem = 'PfsProblem',
@@ -274,7 +285,7 @@ hypeRSpark::configureHyperSpark(setProblem = 'PfsProblem',
                                 )
 ```
 
-The following configuration applies two algorithms on the PfsProblem: a Genetic Algorithm and Simulated Annealing. Furthermore, the maximum execution time in increased to 10 minutes.
+The following configuration is similar to the previous, however, it applies two algorithms on the PfsProblem: a Genetic Algorithm and Simulated Annealing. Furthermore, the maximum execution time in increased to 10 minutes. The number of local executors is set to 2, as we have 2 algorithms.
 
 ```{r, eval=F}
 hypeRSpark::configureHyperSpark(setProblem = 'PfsProblem',
@@ -330,19 +341,19 @@ hypeRSpark::configureHyperSpark(setProblem = "KpProblem",
 
 ## 2.3 packageHyperSpark
 
-This function packages the application and all its dependencies into a JAR archive, using Apache Maven. This JAR can be executed locally or on a cluster, depending on the configuration. Running the function for the first time can take a while, as all dependencies need to be downloaded from the central Maven repository. Subsequent packaging is much faster. The packaging process produces output which can be used to debug the configuration in case of errors. 
+This function packages the application and all its dependencies into a JAR archive, using Apache Maven. This JAR can be executed locally or on a cluster, depending on the configuration. Running the function for the first time can take a while, as all dependencies need to be downloaded from the central Maven repository. Subsequent packaging is much faster. The packaging process produces output which can be used to debug the configuration in case of errors. The JAR archive, which needs to be accessed for cluster execution,  is located in the HyperSpark source code. The file can be found in the folder *'HyperSpark-master/target/'*, the file is named *'hyperh-0.0.1-SNAPSHOT-allinone.jar'*. Please *make sure* to select the correct JAR archive, (not the one without the 'allinone' tag). 
 
 
 
 
 ## 2.4 executeHyperSpark
-HyperSpark can be executed locally, which is mainly used for testing, or on a cluster. The two following sections discuss both options. Note, however, that the package function *executeHyperSpark* can only be used for local execution, as cluster execution relies heavily on the provider. To execute the application locally, simply run the function:
+HyperSpark can be executed locally or on a cluster. Local execution is mainly used for testing purposes. Note, that the package function *executeHyperSpark* can only be used for local execution, as cluster execution relies heavily on the provider. To execute the application locally, simply run the function:
 
 ```{r, eval=F}
 hypeRSpark::executeHyperSpark()
 ```
 
-The function output shows the progress, including any errors. Configuration errors can easily arise. The error usually hints towards where the error arises. 
+Running this function executes the JAR archive created in the packaging phase. Execution is initiated through a Java Virtual Machine, which in turn instantiates Spark. The function output shows the progress, including any errors. Configuration errors can easily arise. The error hints towards where the error arises. Upon successful execution, the solution is printed to the console. Furthermore, the solution is written to a file called *'solution.txt'*, which can be found in the source code folder ('HyperSpark-master').
 
 ### Cluster Execution
 It is important that the cluster has the same Spark and Scala versions as HyperSpark, to avoid issues. The current versions can always be found in the source code, in the file 'pom.xml' in the folder 'hyperspark-1'. At the time of writing Spark version 2.4.7 was used, with Scala version 2.11.11

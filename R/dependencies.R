@@ -22,4 +22,5 @@ dependencies <- function(){
   # Install HyperSpark source code
   print("Downloading HyperSpark, this might take a while")
   install_hyperspark()
+  print("Downloading and unpacking finished.")
 }
