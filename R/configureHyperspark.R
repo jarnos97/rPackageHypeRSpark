@@ -52,7 +52,7 @@ configureHyperSpark <- function(setProblem,
                                 setDeploymentYarnClient = NONE,
                                 setDeploymentYarnCluster = NONE){
   # Define scala file
-  class_file <- "HyperSpark-master/src/main/scala/it/polimi/hyperh/apps/MainClass.scala"  # TODO: this will be different!s
+  class_file <- "HyperSpark-master/src/main/scala/it/polimi/hyperh/apps/MainClass.scala"
 
   # Create scala file and add constant code
   initializeFile <- function(){
