@@ -1,6 +1,6 @@
 #' @title Execute HyperSpark
 #'
-#' @description Executes HyperSpark.
+#' @description Packages the framework to a JAR archive.
 #'
 #' @param NULL
 #'

@@ -1,7 +1,8 @@
 #' @title Install dependencies
 #'
-#' @description Installs the dependencies, including HyperSpark source code from
-#'   Github.
+#' @description Downloads and unpacks the framework's source code from GitHub.
+#' This process creates a new folder, called HyperSpark-master in the working
+#' directory.
 #'
 #' @param NULL
 #'

@@ -10,7 +10,7 @@ packageHyperSpark()
 \item{NULL}{}
 }
 \description{
-Executes HyperSpark.
+Packages the framework to a JAR archive.
 }
 \examples{
 packageHyperSpark()

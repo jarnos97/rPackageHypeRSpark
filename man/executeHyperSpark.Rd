@@ -7,7 +7,8 @@
 executeHyperSpark()
 }
 \description{
-Executes HyperSpark.
+Executes the framework locally. This requires that packaging has
+been successfully executed.
 }
 \examples{
 executeHyperSpark()

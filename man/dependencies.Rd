@@ -10,8 +10,9 @@ dependencies()
 \item{NULL}{}
 }
 \description{
-Installs the dependencies, including HyperSpark source code from
-  Github.
+Downloads and unpacks the framework's source code from GitHub.
+This process creates a new folder, called HyperSpark-master in the working
+directory.
 }
 \examples{
 dependencies()

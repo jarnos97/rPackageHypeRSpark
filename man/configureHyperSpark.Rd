@@ -52,8 +52,9 @@ file, which is added to the HyperSpark source code.
 \examples{
 hypeRSpark::configureHyperSpark(setProblem = 'PfsProblem',
 data = 'inst_ta054.txt', setStoppingCondition = 'TimeExpired',
-stoppingValue = 1000, setAlgorithms = 'GAAlgorithm', numOfAlgorithms = 4,
-setDeploymentLocalMaxCores = T, setNumberOfIterations = 100,
-setNDefaultInitialSeeds = 4)
+stoppingValue = 180000, setAlgorithms = "TSAlgorithm(maxTabooListSize=7)",
+numOfAlgorithms = 34, setNDefaultInitialSeeds = 34,
+setDeploymentMesos = '("spark://207.184.161.138", 7077)',
+setNumberOfIterations = 6, setSeedingStrategy = 'SeedPlusSlidingWindow(10)')
 
 }
