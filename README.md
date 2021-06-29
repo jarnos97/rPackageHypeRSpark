@@ -8,12 +8,12 @@ Users can select a problem, algorithm(s), and configure the framework based on t
 Subsequently, the framework is packaged to a JAR archive. 
 Upon execution the framework either connects to a JVM instance and executes HyperSpark, in the case of local execution, or the user submits the packaged framework to a cluster with Spark, in case of distributed execution. 
 
-The package needs to be built in order to be used. HypeRSpark can be directly installed from GitHub using R's developer tools package, called \emph{devtools}. 
+The package needs to be built in order to be used. HypeRSpark can be directly installed from GitHub using R's developer tools package, called *devtools*.
 Doing only requires a single line of code, shown below (line 3). In the case that the user does not have devtools installed, line 1 should also be executed.
 Two forms of documentation have been developed to guide users. 
 First, the package includes object documentation, accessible through R's *help* function. 
 This type of documentation is useful when the user knows which function they want information about. 
-However, this is not always the case. Subsequently, a detailed \emph{vignette} was developed as a secondary form of documentation. 
+However, this is not always the case. Subsequently, a detailed vignette was developed as a secondary form of documentation. 
 The vignette is added to the GitHub repository of the package. 
 The vignette is built when installing the packages, through the *build_vignettes* argument, this can be time consuming. 
 Building the vignette requires *rmarkdown* to be installed. 
